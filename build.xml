@@ -1,0 +1,96 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="testproject01" default="main" basedir=".">
+	<description>
+		Create a Spring MVC (WAR) with Ant build script
+	</description>
+
+	<!-- Project Structure -->
+	<property name="jdk.version" value="1.8" />
+	<property name="src.dir" location="src" />
+	<property name="test.dir" location="src" />
+	<property name="report.dir" location="report" />
+
+	<property name="resources.dir" location="resources" />
+	<property name="web.dir" value="war" />
+	<property name="classes.dir" location="classes" />
+	<property name="target.dir" location="target" />
+	<property name="target.temp.dir" location="target/temp" />
+	<property name="lib.dir" value="lib" />
+	
+	<path id="compile.path">
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    <path location="[LocalPath]/junit-4.8.2.jar"/>
+	</path>
+	
+	<!-- Compile Java source from ${src.dir} and output it to ${classes.dir} -->
+	<target name="compile" depends="init" description="compile source code">
+		<mkdir dir="${classes.dir}" />
+		<javac destdir="${classes.dir}" source="${jdk.version}" target="${jdk.version}" debug="true" includeantruntime="false" classpathref="compile.path">
+			<src path="${src.dir}" />
+		</javac>
+	</target>
+
+	<!-- Copy *.xml or *.properties from ${resources.dir} to ${classes.dir} -->
+	<target name="copy-resources" description="copy Java resources like xml and properties files">
+		<copy todir="${classes.dir}">
+			<fileset dir="${resources.dir}">
+				<include name="**/*.xml" />
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- Run jUnit -->
+	<target name="junit" depends="compile">
+
+		<!--<pathconvert property="classpathProp" refid="junit.class.path" />
+		<echo>Classpath is ${classpathProp}</echo>-->
+
+		<junit printsummary="yes" haltonfailure="no">
+
+			<!--
+			<classpath location="lib/junit-4.11.jar" />
+			<classpath location="lib/hamcrest-core-1.3.jar" />
+			-->
+			
+			<!-- This classpath must include junit.jar -->
+			<classpath refid="compile.path" />
+			<!-- classes for test -->
+			<classpath location="${classes.dir}" />
+			
+			<!--
+			<formatter type="xml" />
+
+			<batchtest fork="yes" todir="${report.dir}">
+				<fileset dir="${test.dir}">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+			-->
+			
+			<test name="TestCase.SimpleTC_01" 
+				haltonfailure="no" todir="${report.dir}" outfile="result">
+				<formatter type="plain" />
+				<formatter type="xml" />
+			</test>
+			
+		</junit>
+	</target>
+
+	<!-- Create folders -->
+	<target name="init" depends="clean">
+		<mkdir dir="${src.dir}" />
+		<mkdir dir="${target.dir}" />
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${report.dir}" />
+	</target>
+
+	<!-- Delete folders -->
+	<target name="clean" description="clean up">
+		<delete dir="${classes.dir}" />
+		<delete dir="${target.dir}" />
+		<delete dir="${report.dir}" />
+	</target>
+
+	<target name="main" depends="junit" />
+
+</project>
