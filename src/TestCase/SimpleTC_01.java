@@ -31,6 +31,7 @@ public class SimpleTC_01 extends UnitTestClassBase {
 	 instance = new SimpleTC_01();
 	 System.out.println(SimpleTC_01.class);
 	 globalSetup(SimpleTC_01.class);
+	 System.out.println(System.getenv());
 	 }
 	
 	@AfterClass
